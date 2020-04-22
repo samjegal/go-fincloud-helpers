@@ -3,6 +3,8 @@ package authentication
 import (
 	"fmt"
 	"log"
+	"os"
+	"runtime"
 	"time"
 
 	"github.com/Azure/go-autorest/autorest"
@@ -30,9 +32,20 @@ func (s serviceNsaCertkeyAuth) isApplicable(b Builder) bool {
 }
 
 func (s serviceNsaCertkeyAuth) getAuthorizationToken(sender autorest.Sender, endpoint string) (autorest.Authorizer, error) {
-	// TODO: ENV 환경변수값으로 읽을 수가 있어야 한다.
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+
+	var path string
+	if runtime.GOOS == "windows" {
+		path = "\\.fincloud\\fincloud-certs.yml"
+	} else {
+		path = "/.fincloud/fincloud-certs.yml"
+	}
+
 	config := fincloud.Config{
-		Path: "/Users/samjegal/.fincloud/fincloud-certs.yml",
+		Path: home + path,
 	}
 
 	certdata, err := config.Parse()
@@ -42,6 +55,8 @@ func (s serviceNsaCertkeyAuth) getAuthorizationToken(sender autorest.Sender, end
 
 	var createdYmdt string
 	var certKey string
+	var duration time.Duration
+
 	for _, cert := range certdata.CertificateList {
 		if cert.SubaccountName == s.Subaccount {
 			createdYmdt = cert.CreateYmdt
@@ -50,14 +65,17 @@ func (s serviceNsaCertkeyAuth) getAuthorizationToken(sender autorest.Sender, end
 		}
 	}
 
-	timeFormat := "2006-01-02 15:04:05 MST"
-	t, err := time.Parse(timeFormat, createdYmdt)
-	if err != nil {
-		log.Fatalf("error: %v", err)
+	if createdYmdt != "" {
+		timeFormat := "2006-01-02 15:04:05 MST"
+		t, err := time.Parse(timeFormat, createdYmdt)
+		if err != nil {
+			log.Fatalf("error: %v", err)
+		}
+
+		duration = time.Since(t)
 	}
 
-	duration := time.Since(t)
-	if duration.Hours() > 6 || certKey == "" {
+	if certKey == "" || createdYmdt == "" || duration <= 0 || duration.Hours() > 6 {
 		builder := &webdriver.Builder{
 			Subaccount: s.Subaccount,
 			Username:   s.Username,
