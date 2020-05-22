@@ -32,7 +32,7 @@ func (b Builder) Build() (*Config, error) {
 	}
 
 	for _, method := range supportAuthenticationMethods {
-		name := method.name()
+		// name := method.name()
 		//log.Printf("Testing if %s is applicable for Authentication..", name)
 
 		if !method.isApplicable(b) {
