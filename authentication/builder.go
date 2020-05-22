@@ -2,7 +2,6 @@ package authentication
 
 import (
 	"fmt"
-	"log"
 )
 
 type Builder struct {
