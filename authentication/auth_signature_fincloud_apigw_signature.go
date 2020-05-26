@@ -50,6 +50,7 @@ func (s serviceApiGWSignatureAuth) getAuthorizationToken(sender autorest.Sender,
 	if s.apiGatewayKey != "" {
 		headers["x-ncp-apigw-api-key"] = s.apiGatewayKey
 		headers["x-ncp-dmn_cd"] = "FIN"
+		headers["x-ncp-region_code"] = "FKR"
 	}
 
 	// 1970년 1월 1일 00:00:00 협정 세계시(UTC)부터의 경과 시간을 밀리초(Millisecond)
