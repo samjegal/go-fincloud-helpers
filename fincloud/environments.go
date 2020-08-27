@@ -27,7 +27,8 @@ type Environment struct {
 var (
 	FinancialCloud = Environment{
 		Name:                    "FinancialCloud",
-		ResourceManagerEndpoint: "https://console.fin-ncloud.com",
+		ResourceManagerEndpoint: "https://fin-ncloud.apigw.fin-ntruss.com",
+		// ResourceManagerEndpoint: "https://console.fin-ncloud.com",
 	}
 )
 
