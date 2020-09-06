@@ -8,7 +8,7 @@ type Builder struct {
 	CertTokenPath string
 	Environment   string
 
-	AccessKeyId   string
+	AccessKey     string
 	SecretKey     string
 	ApiGatewayKey string
 
